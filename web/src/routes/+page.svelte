@@ -1,24 +1,48 @@
 <script lang="ts">
+	import { RemoteRunnable } from '@langchain/core/runnables/remote';
+
 	let question = '';
 	let answer = '';
+    let context = [];
+	let streamingActive = false;
+	let streamController;
+
+	const remoteChain = new RemoteRunnable({
+		url: 'http://localhost:8000/agent/stream'
+	});
 
 	async function handleKeyDown(event: KeyboardEvent) {
-		if (event.key !== 'Enter') return;
+		if (event.key !== 'Enter' || streamingActive) return;
 		event.preventDefault();
 
 		const description = question.trim();
 		if (description) {
-			try {
-				const response = await fetch('http://localhost:8000/agent/invoke', {
-					method: 'POST',
+			answer = '';
+			const remoteChain = new RemoteRunnable({
+				url: 'http://localhost:8000/agent/',
+				options: {
+					timeout: 10000,
 					headers: {
 						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify({ input: { input: description }, config: {} })
+					}
+				}
+			});
+
+			try {
+				const stream = await remoteChain.stream({
+					input: description,
+					config: {}
 				});
-				const result = await response.json();
-				console.log(result);
-				answer = result.output.answer;
+
+                for await (const chunk of stream) {
+                    if (chunk.answer) {
+                        answer = answer + chunk.answer;
+                    } else if (chunk.context) {
+                        context = chunk.context;
+                    } else {
+                        console.log("Received unrecognised data:", chunk);
+                    }
+                }
 			} catch (error) {
 				console.error('Error:', error);
 			}
@@ -26,14 +50,27 @@
 	}
 
 	function handleButton() {
+		if (streamingActive && streamController) {
+			streamController.abort();
+		}
 		question = '';
 		answer = '';
+        context = [];
+		streamingActive = false;
 	}
 </script>
 
 <input placeholder="Your question" bind:value={question} on:keydown={handleKeyDown} />
 
+{#each context as ctx}
+    <div>
+        <p>Source: {ctx.metadata.source}</p>
+        <p>{ctx.pageContent}</p>
+    </div>
+{/each}
+
 <p>{answer}</p>
+
 
 {#if question != '' && answer != ''}
 	<button on:click={handleButton}>Clear</button>
@@ -128,3 +165,5 @@
 		}
 	}
 </style>
+
+
