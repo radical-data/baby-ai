@@ -8,7 +8,13 @@
 	let streamController;
 
 	const remoteChain = new RemoteRunnable({
-		url: 'http://localhost:8000/agent/stream'
+		url: 'http://localhost:8000/agent/',
+		options: {
+			timeout: 10000,
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		}
 	});
 
 	async function handleKeyDown(event: KeyboardEvent) {
@@ -18,15 +24,6 @@
 		const description = question.trim();
 		if (description) {
 			answer = '';
-			const remoteChain = new RemoteRunnable({
-				url: 'http://localhost:8000/agent/',
-				options: {
-					timeout: 10000,
-					headers: {
-						'Content-Type': 'application/json'
-					}
-				}
-			});
 
 			try {
 				const stream = await remoteChain.stream({
