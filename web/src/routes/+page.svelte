@@ -3,14 +3,15 @@
 
 	let question = '';
 	let answer = '';
-    let context = [];
+	let context = [];
 	let streamingActive = false;
 	let streamController;
+	let showContext = false;
 
 	const remoteChain = new RemoteRunnable({
 		url: 'http://localhost:8000/agent/',
 		options: {
-			timeout: 10000,
+			timeout: 100000,
 			headers: {
 				'Content-Type': 'application/json'
 			}
@@ -31,15 +32,15 @@
 					config: {}
 				});
 
-                for await (const chunk of stream) {
-                    if (chunk.answer) {
-                        answer = answer + chunk.answer;
-                    } else if (chunk.context) {
-                        context = chunk.context;
-                    } else {
-                        console.log("Received unrecognised data:", chunk);
-                    }
-                }
+				for await (const chunk of stream) {
+					if (chunk.answer) {
+						answer = answer + chunk.answer;
+					} else if (chunk.context) {
+						context = chunk.context;
+					} else {
+						console.log('Received unrecognised data:', chunk);
+					}
+				}
 			} catch (error) {
 				console.error('Error:', error);
 			}
@@ -52,22 +53,39 @@
 		}
 		question = '';
 		answer = '';
-        context = [];
+		context = [];
 		streamingActive = false;
+	}
+
+	function toggleContext() {
+		showContext = !showContext;
+	}
+
+	function extractSourceName(sourcePath: string): string {
+		const parts = sourcePath.split('/');
+		const fileName = parts[parts.length - 1];
+		return fileName.split('.')[0];
 	}
 </script>
 
 <input placeholder="Your question" bind:value={question} on:keydown={handleKeyDown} />
 
-{#each context as ctx}
-    <div>
-        <p>Source: {ctx.metadata.source}</p>
-        <p>{ctx.pageContent}</p>
-    </div>
-{/each}
+{#if context.length > 0}
+	<button on:click={toggleContext}>
+		{showContext ? 'Hide Context' : 'Show Context'}
+	</button>
+{/if}
+
+{#if showContext}
+	{#each context as ctx}
+		<div>
+			<p class="source-quote">{ctx.pageContent}</p>
+			<p class="source">Source: {extractSourceName(ctx.metadata.source)}</p>
+		</div>
+	{/each}
+{/if}
 
 <p>{answer}</p>
-
 
 {#if question != '' && answer != ''}
 	<button on:click={handleButton}>Clear</button>
@@ -75,12 +93,17 @@
 
 <style>
 	:global(body) {
+		background-color: #000000;
+		color: #ffffff;
+		font-family: Inter;
+		/* font-family: MachineLearningFont; */
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		height: 100vh;
+		min-height: 100vh;
 		padding: 0;
 		margin: 0;
+		overflow-y: auto;
 	}
 
 	input {
@@ -104,6 +127,8 @@
 		box-sizing: border-box;
 		outline: none;
 		word-break: break-word;
+
+		font-family: MachineLearningFont;
 	}
 
 	p {
@@ -161,6 +186,14 @@
 			min-width: 170px;
 		}
 	}
+
+	.source-quote {
+		font-size: 24px;
+		font-weight: normal;
+	}
+
+	.source {
+		font-size: 18px; /* Smaller font than content */
+		font-style: italic; /* Italicize to indicate metadata */
+	}
 </style>
-
-

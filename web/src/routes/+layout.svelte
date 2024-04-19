@@ -10,12 +10,3 @@
 <main>
 	<slot />
 </main>
-
-<style>
-	:global(body) {
-		background-color: #000000;
-        color: #ffffff;
-        height: 100vh;
-		font-family: Inter;
-	}
-</style>
