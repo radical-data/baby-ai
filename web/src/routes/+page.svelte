@@ -18,32 +18,55 @@
 		}
 	});
 
+	function clearAndFocusInput() {
+		question = '';
+		answer = '';
+		context = [];
+		streamingActive = false;
+		if (streamController) {
+			streamController.abort();
+		}
+		let input = document.querySelector('input');
+		if (input) input.focus();
+	}
+
 	async function handleKeyDown(event: KeyboardEvent) {
-		if (event.key !== 'Enter' || streamingActive) return;
-		event.preventDefault();
+		if (streamingActive) return;
 
-		const description = question.trim();
-		if (description) {
-			answer = '';
+		if (event.key === 'Enter') {
+			event.preventDefault();
 
-			try {
-				const stream = await remoteChain.stream({
-					input: description,
-					config: {}
-				});
+			const description = question.trim();
+			if (description) {
+				answer = '';
 
-				for await (const chunk of stream) {
-					if (chunk.answer) {
-						answer = answer + chunk.answer;
-					} else if (chunk.context) {
-						context = chunk.context;
-					} else {
-						console.log('Received unrecognised data:', chunk);
+				try {
+					const stream = await remoteChain.stream({
+						input: description,
+						config: {}
+					});
+
+					for await (const chunk of stream) {
+						if (chunk.answer) {
+							answer = answer + chunk.answer;
+						} else if (chunk.context) {
+							context = chunk.context;
+						} else {
+							console.log('Received unrecognised data:', chunk);
+						}
 					}
+				} catch (error) {
+					console.error('Error:', error);
 				}
-			} catch (error) {
-				console.error('Error:', error);
 			}
+		} else if (event.key === 'c') {
+			toggleContext();
+		} else if (event.key === 'n') {
+			if (answer != '') {
+				event.preventDefault();
+				clearAndFocusInput();
+			}
+		} else {
 		}
 	}
 
@@ -72,7 +95,7 @@
 
 {#if context.length > 0}
 	<button on:click={toggleContext}>
-		{showContext ? 'Hide Context' : 'Show Context'}
+		{showContext ? 'Hide Context ' : 'Show Context '}<span class="key-hint">(c)</span>
 	</button>
 {/if}
 
@@ -88,7 +111,7 @@
 <p>{answer}</p>
 
 {#if question != '' && answer != ''}
-	<button on:click={handleButton}>Clear</button>
+	<button on:click={handleButton}>New question <span class="key-hint">(n)</span></button>
 {/if}
 
 <style>
@@ -123,7 +146,7 @@
 		border-bottom: 10px solid #ffffff;
 		padding: 20px;
 		width: 90%;
-		max-width: 800px;
+		max-width: 95vw;
 		box-sizing: border-box;
 		outline: none;
 		word-break: break-word;
@@ -195,5 +218,12 @@
 	.source {
 		font-size: 18px; /* Smaller font than content */
 		font-style: italic; /* Italicize to indicate metadata */
+	}
+
+	.key-hint {
+		/* font-size: 14px; */
+		/* /* color: #ccc; */
+		font-style: italic; /* Italic style */
+		margin-left: 5px; /* Add a little space before the hint */
 	}
 </style>
