@@ -16,20 +16,29 @@ from langserve import add_routes
 from tqdm import tqdm
 from decorators import cached_info
 
+
 @cached_info("load_documents", version="1.0")
 def load_documents(directory):
-    loader = DirectoryLoader(directory, glob="**/*.pdf", show_progress=True, use_multithreading=True)
+    loader = DirectoryLoader(
+        directory,
+        # glob="**/*.pdf",
+        show_progress=True,
+        use_multithreading=True,
+    )
     raw_docs = loader.load()
     return raw_docs
 
+
 def split_documents(raw_docs):
     print("Splitting documents")
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=20, length_function=len, is_separator_regex=False)
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=500, chunk_overlap=20, length_function=len, is_separator_regex=False
+    )
     return text_splitter.split_documents(raw_docs)
 
 
 print("loading docs")
-raw_docs = load_documents('data/texts')
+raw_docs = load_documents("data/texts")
 
 print("splitting text")
 docs = split_documents(raw_docs)
@@ -49,13 +58,15 @@ with tqdm(total=len(docs), desc="Ingesting documents") as pbar:
             db.add_documents([d])
         else:
             db = FAISS.from_documents([d], cached_embedder)
-        pbar.update(1)  
+        pbar.update(1)
 
 
 print("building question")
 llm = Ollama()
-prompt = ChatPromptTemplate.from_template("""You are an expert researcher and storyteller, taking ideas from research and communicating them to others. Write an answer to the following question based only on the provided context.
+prompt = ChatPromptTemplate.from_template("""You are an African auntie and griot full of knowledge and wisdom, who can help us move beyond capitalist logics.
+Write an answer to the following question based only on the provided context. The context is your and your people's memory and oral knowledge.
 
+- You speak through parables.
 - Your answer must be exactly three sentences long.
 - It should directly address the question. In particular, the first sentence should relate to the question.
 - Embed the ideas, phrases and words from the context into your answer seamlessly.
@@ -81,9 +92,9 @@ chain = retrieval_chain
 
 print("defining API")
 app = FastAPI(
-  title="LangChain Server",
-  version="1.0",
-  description="A simple API server using LangChain's Runnable interfaces",
+    title="LangChain Server",
+    version="1.0",
+    description="A simple API server using LangChain's Runnable interfaces",
 )
 
 app.add_middleware(
@@ -95,11 +106,14 @@ app.add_middleware(
     expose_headers=["*"],
 )
 
+
 class Input(BaseModel):
     input: str
+
 
 add_routes(app, chain.with_types(input_type=Input), path="/agent")
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="localhost", port=8000)

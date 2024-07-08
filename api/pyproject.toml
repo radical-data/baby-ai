@@ -14,7 +14,7 @@ faiss-cpu = "^1.8.0"
 langserve = {extras = ["all"], version = "^0.0.51"}
 langchainhub = "^0.1.15"
 pandoc = "^2.3"
-unstructured = "^0.12.6"
+unstructured = {extras = ["pdf"], version = "^0.13.2"}
 pypandoc = "^1.13"
 markdown = "^3.6"
 langchain-ai21 = "^0.1.2"
