@@ -1,5 +1,4 @@
 .env
-poetry.lock
 cache
 .cache
 data
