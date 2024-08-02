@@ -1,0 +1,22 @@
+services:
+  api:
+    build: ./api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api:/app
+      - ./data/texts:/app/data/texts
+    networks:
+      - app-network
+
+  web:
+    build: ./web
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    networks:
+      - app-network
+
+networks:
+  app-network:
