@@ -1,3 +1,7 @@
+<script lang="ts">
+	import '$lib/style.css';
+</script>
+
 <svelte:head>
 	<title>Baby AI</title>
 	<!-- CSS Reset -->

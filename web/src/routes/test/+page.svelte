@@ -131,7 +131,7 @@
 		background-color: #000000;
 		color: #ffffff;
 		font-family: Inter;
-		/* font-family: MachineLearningFont; */
+		/* font-family: MLFont1; */
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -164,7 +164,7 @@
 		outline: none;
 		word-break: break-word;
 
-		font-family: MachineLearningFont;
+		font-family: MLFont1;
 	}
 
 	textarea {
