@@ -27,7 +27,17 @@ To run Baby AI, you need to set up both parts.
 
 ## Getting Started
 
-### Prerequisites
+There are two options for running this: Docker or Not-Docker.
+
+### Docker
+
+1. Install Docker and Ollama.
+1. Run Docker and Ollama.
+1. Run Docker Compose: `docker compose up`.
+
+### Not-Docker
+
+#### Prerequisites
 
 Make sure you have the following installed:
 
@@ -37,7 +47,7 @@ Make sure you have the following installed:
 - [npm](https://www.npmjs.com/get-npm)
 - [Ollama](https://ollama.com/download)
 
-### Setting Up the API
+#### Setting Up the API
 
 1. Open a terminal and navigate to the `api` directory:
 
@@ -57,7 +67,7 @@ poetry install
 poetry run python src/docs-retrieval
 ```
 
-### Setting Up the Webpage
+#### Setting Up the Webpage
 
 1. Open a new terminal and navigate to the `web` directory:
 
