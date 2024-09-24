@@ -11,7 +11,7 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from langchain.pydantic_v1 import BaseModel
+from pydantic import BaseModel
 from langserve import add_routes
 from tqdm import tqdm
 from decorators import cached_info
