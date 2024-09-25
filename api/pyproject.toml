@@ -6,7 +6,7 @@ authors = ["Jo Kroese <jo@jokroese.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9,<3.13"
 langchain = ">=0.3,<0.4"
 faiss-cpu = "^1.8.0"
 langserve = {extras = ["all"], version = ">=0.3,<0.4"}
@@ -14,6 +14,7 @@ tqdm = "^4.66.2"
 langchain-cli = "^0.0.31"
 langchain-community = ">=0.3,<0.4"
 langchain-core = ">=0.3,<0.4"
+unstructured = {extras = ["pdf"], version = "^0.15.13"}
 
 
 [build-system]
