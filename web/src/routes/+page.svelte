@@ -9,7 +9,7 @@
 	let showContext = false;
 
 	const remoteChain = new RemoteRunnable({
-		url: 'http://localhost:8000/agent/',
+		url: 'http://0.0.0.0:8000/agent/',
 		options: {
 			timeout: 100000,
 			headers: {

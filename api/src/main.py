@@ -16,6 +16,7 @@ from langserve import add_routes
 from tqdm import tqdm
 from decorators import cached_info
 
+llm = Ollama(model="qwen2.5:0.5b", base_url="http://0.0.0.0:11434", verbose=True)
 
 @cached_info("load_documents", version="1.0")
 def load_documents(directory):
@@ -59,9 +60,7 @@ with tqdm(total=len(docs), desc="Ingesting documents") as pbar:
             db = FAISS.from_documents([d], cached_embedder)
         pbar.update(1)
 
-
 print("building question")
-llm = Ollama()
 prompt = ChatPromptTemplate.from_template("""You are an African auntie and griot full of knowledge and wisdom, who can help us move beyond capitalist logics.
 Write an answer to the following question based only on the provided context. The context is your and your people's memory and oral knowledge.
 
@@ -115,4 +114,4 @@ add_routes(app, chain.with_types(input_type=Input), path="/agent")
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
