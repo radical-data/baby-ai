@@ -14,4 +14,4 @@ COPY src/ /app/src/
 
 EXPOSE 8000
 
-CMD ["poetry", "run", "python", "src/docs-retrieval.py"]
+CMD ["poetry", "run", "python", "src/main.py"]

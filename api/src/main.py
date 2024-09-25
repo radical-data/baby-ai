@@ -21,7 +21,6 @@ from decorators import cached_info
 def load_documents(directory):
     loader = DirectoryLoader(
         directory,
-        # glob="**/*.pdf",
         show_progress=True,
         use_multithreading=True,
     )
