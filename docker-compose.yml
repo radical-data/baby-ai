@@ -6,8 +6,12 @@ services:
     volumes:
       - ./api:/app
       - ./data/texts:/app/data/texts
+    depends_on:
+      - ollama
     networks:
       - app-network
+    environment:
+      - OLLAMA_URL=http://ollama:11434
 
   web:
     build: ./web
@@ -18,5 +22,19 @@ services:
     networks:
       - app-network
 
+  ollama:
+    build: ./ollama
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - app-network
+    entrypoint: /usr/local/bin/download_model.sh
+
 networks:
   app-network:
+
+
+volumes:
+  ollama:
