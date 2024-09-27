@@ -1,7 +1,14 @@
+# Base image for Ollama
 FROM ollama/ollama
 
-RUN apt-get update && apt-get install -y curl
+# Set working directory
+WORKDIR /app
 
-COPY download_model.sh /usr/local/bin/download_model.sh
+# Copy the start script into the container
+COPY start-ollama.sh /app/start-ollama.sh
 
-RUN chmod +x /usr/local/bin/download_model.sh
+# Make the script executable
+RUN chmod +x /app/start-ollama.sh
+
+# Run the script in a shell environment
+ENTRYPOINT ["/bin/sh", "/app/start-ollama.sh"]

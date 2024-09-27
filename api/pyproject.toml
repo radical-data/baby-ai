@@ -15,6 +15,7 @@ langchain-cli = "^0.0.31"
 langchain-community = ">=0.3,<0.4"
 langchain-core = ">=0.3,<0.4"
 unstructured = {extras = ["pdf"], version = "^0.15.13"}
+langchain-ollama = "^0.2.0"
 
 
 [build-system]
