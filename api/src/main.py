@@ -1,33 +1,14 @@
-import os
 from fastapi import FastAPI
-from langchain_ollama.llms import OllamaLLM
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langserve import add_routes
 from fastapi.middleware.cors import CORSMiddleware
+from langserve import add_routes
+from llm import setup_langchain
+from config import get_model_name
 
-# Define the Ollama LLM
-model_name = os.getenv("OLLAMA_MODEL")
-if not model_name:
-    raise EnvironmentError(
-        "The OLLAMA_MODEL environment variable is not defined. Please set it to the desired model."
-    )
-llm = OllamaLLM(model=model_name)
 
-# Create prompt template
-prompt_template = ChatPromptTemplate.from_messages(
-    [
-        ("user", "{text}")
-    ]
-)
+model_name = get_model_name()
 
-# Create parser
-parser = StrOutputParser()
+chain = setup_langchain(model_name)
 
-# Create chain
-chain = prompt_template | llm | parser
-
-# Define FastAPI app
 app = FastAPI(
     title="LangChain with Ollama",
     version="1.0",
@@ -43,7 +24,6 @@ app.add_middleware(
     expose_headers=["*"],
 )
 
-# Add chain route
 add_routes(app, chain, path="/agent")
 
 if __name__ == "__main__":
