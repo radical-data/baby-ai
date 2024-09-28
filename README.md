@@ -35,6 +35,7 @@ Docker is the easiest way to run Baby AI. Even if you’re new to Docker, gettin
 
 1. Install Docker.
 1. Run Docker.
+1. Create a .env file in the root of the project based on `.env.example`, for example by running `cp .env.example .env`.
 1. Run Docker Compose: `docker compose up --build`.
 
 Now Baby AI should be accessible at http://localhost:5173/.
@@ -105,6 +106,12 @@ Now Baby AI should be accessible at http://localhost:5173/.
 ## Playing with the API
 
 Once it is running, you can also access the API through Langchain's own UI at http://localhost:8000/agent/playground/.
+
+## Customising the Model
+
+### Underlying Model
+
+By default, the project uses the model defined in the .env file. You can refer to [Ollama's model library](https://ollama.com/library) for available models and modify the .env file to use another model.
 
 ## Troubleshooting
 
