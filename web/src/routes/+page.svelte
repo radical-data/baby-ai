@@ -22,11 +22,13 @@
 		answer = '';
 
 		try {
-			const result = await remoteRunnable.invoke({
+			const stream = await remoteRunnable.stream({
 				text: question
 			});
 
-			answer = result;
+			for await (const chunk of stream) {
+				answer += chunk;
+			}
 		} catch (error) {
 			console.error('Error:', error);
 			answer = 'Error: Something went wrong';
