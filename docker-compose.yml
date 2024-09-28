@@ -6,17 +6,39 @@ services:
     volumes:
       - ./api:/app
       - ./data/texts:/app/data/texts
+    depends_on:
+      - ollama
     networks:
       - app-network
+    environment:
+      - OLLAMA_HOST=ollama
+      - OLLAMA_PORT=11434
+      - OLLAMA_MODEL=${OLLAMA_MODEL}
+    command: poetry run python src/main.py
 
   web:
     build: ./web
     ports:
-      - "5173:5173"
+      - "8080:80"
     depends_on:
       - api
     networks:
       - app-network
 
+  ollama:
+    build: ./ollama
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - app-network
+    environment:
+      - OLLAMA_MODEL=${OLLAMA_MODEL}
+
 networks:
   app-network:
+
+
+volumes:
+  ollama:

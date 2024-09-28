@@ -13,29 +13,34 @@ Baby AI, currently in the form of a large language model, was born from question
 You are invited to join the co-parenting of Baby AI by:
 
 - Speaking to it.
-- Reading new texts to it.
-- Suggesting new ways for it to learn and grow.
+- Reading new texts to it, by uploading documents for training data.
+- Suggesting new ways for it to learn and grow, whether through sharing your ideas with us, code contributions, or prompt design.
 
 ## Project Structure
 
 Baby AI consists of two main parts:
 
-1.	API: Handles backend processing and data retrieval.
-2.	Webpage: Provides an interactive interface.
+1. API: Handles backend processing and data retrieval.
+2. Webpage: Provides an interactive interface.
 
 To run Baby AI, you need to set up both parts.
 
 ## Getting Started
 
-There are two options for running this: Docker or Not-Docker.
+There are two options for running Baby AI: **Docker** or **manual setup**.
 
-### Docker
+### Docker (Recommended)
 
-1. Install Docker and Ollama.
-1. Run Docker and Ollama.
-1. Run Docker Compose: `docker compose up`.
+Docker is the easiest way to run Baby AI. Even if you’re new to Docker, getting started is as simple as downloading one program and running a single command.
 
-### Not-Docker
+1. Install Docker.
+1. Run Docker.
+1. Create a .env file in the root of the project based on `.env.example`, for example by running `cp .env.example .env`.
+1. Run Docker Compose: `docker compose up --build`.
+
+Now Baby AI should be accessible at http://localhost:5173/.
+
+### Manual Setup
 
 #### Prerequisites
 
@@ -46,6 +51,15 @@ Make sure you have the following installed:
 - [Node.js](https://nodejs.org/en/download/)
 - [npm](https://www.npmjs.com/get-npm)
 - [Ollama](https://ollama.com/download)
+
+#### Setting Up Ollama
+
+You need to run the Ollama service manually in the background for Baby AI to function. Install Ollama, and then use the following command to download a model and start the Ollama service:
+
+```sh
+ollama pull llama2  # Replace llama2 with the model you want
+ollama serve
+```
 
 #### Setting Up the API
 
@@ -64,7 +78,7 @@ poetry install
 3. Run the API:
 
 ```sh
-poetry run python src/docs-retrieval
+poetry run python src/main.py
 ```
 
 #### Setting Up the Webpage
@@ -85,4 +99,26 @@ npm install
 
 ```sh
 npm run dev
+```
+
+Now Baby AI should be accessible at http://localhost:5173/.
+
+## Playing with the API
+
+Once it is running, you can also access the API through Langchain's own UI at http://localhost:8000/agent/playground/.
+
+## Customising the Model
+
+### Underlying Model
+
+By default, the project uses the model defined in the .env file. You can refer to [Ollama's model library](https://ollama.com/library) for available models and modify the .env file to use another model.
+
+## Troubleshooting
+
+Sometimes outdated Docker images or cached layers cause issues. Rebuild your Docker image to ensure everything is up to date.
+
+```bash
+docker compose down --volumes
+docker compose build --no-cache
+docker compose up
 ```

@@ -3,123 +3,62 @@
 
 	let question = '';
 	let answer = '';
-	let context = [];
-	let streamingActive = false;
-	let streamController;
-	let showContext = false;
+	let isLoading = false;
 
-	const remoteChain = new RemoteRunnable({
-		url: 'http://localhost:8000/agent/',
+	const remoteRunnable = new RemoteRunnable({
+		url: 'http://localhost:8000/agent',
 		options: {
-			timeout: 100000,
+			timeout: 10000000,
 			headers: {
 				'Content-Type': 'application/json'
 			}
 		}
 	});
 
-	function clearAndFocusInput() {
-		question = '';
+	async function speakToAPI() {
+		if (!question.trim()) return;
+
+		isLoading = true;
 		answer = '';
-		context = [];
-		streamingActive = false;
-		if (streamController) {
-			streamController.abort();
-		}
-		let input = document.querySelector('input');
-		if (input) input.focus();
-	}
 
-	async function handleKeyDown(event: KeyboardEvent) {
-		if (streamingActive) return;
+		try {
+			const stream = await remoteRunnable.stream({
+				text: question
+			});
 
-		if (event.key === 'Enter') {
-			event.preventDefault();
-
-			const description = question.trim();
-			if (description) {
-				answer = '';
-
-				try {
-					const stream = await remoteChain.stream({
-						input: description,
-						config: {}
-					});
-
-					for await (const chunk of stream) {
-						if (chunk.answer) {
-							answer = answer + chunk.answer;
-						} else if (chunk.context) {
-							context = chunk.context;
-						} else {
-							console.log('Received unrecognised data:', chunk);
-						}
-					}
-				} catch (error) {
-					console.error('Error:', error);
-				}
+			for await (const chunk of stream) {
+				answer += chunk;
 			}
-		} else if (event.key === 'c') {
-			toggleContext();
-		} else if (event.key === 'n') {
-			if (answer != '') {
-				event.preventDefault();
-				clearAndFocusInput();
-			}
-		} else {
+		} catch (error) {
+			console.error('Error:', error);
+			answer = 'Error: Something went wrong';
+		} finally {
+			isLoading = false;
 		}
-	}
-
-	function handleButton() {
-		if (streamingActive && streamController) {
-			streamController.abort();
-		}
-		question = '';
-		answer = '';
-		context = [];
-		streamingActive = false;
-	}
-
-	function toggleContext() {
-		showContext = !showContext;
-	}
-
-	function extractSourceName(sourcePath: string): string {
-		const parts = sourcePath.split('/');
-		const fileName = parts[parts.length - 1];
-		return fileName.split('.')[0];
 	}
 </script>
 
-<input placeholder="Your question" bind:value={question} on:keydown={handleKeyDown} />
+<main>
+	<input
+		placeholder="Your question"
+		bind:value={question}
+		on:keydown={(event) => event.key === 'Enter' && speakToAPI()}
+	/>
 
-{#if context.length > 0}
-	<button on:click={toggleContext}>
-		{showContext ? 'Hide Context ' : 'Show Context '}<span class="key-hint">(c)</span>
+	<button on:click={speakToAPI} disabled={isLoading || !question.trim()}>
+		{isLoading ? 'Thinking...' : 'Say something'}
 	</button>
-{/if}
 
-{#if showContext}
-	{#each context as ctx}
-		<div>
-			<p class="source-quote">{ctx.pageContent}</p>
-			<p class="source">Source: {extractSourceName(ctx.metadata.source)}</p>
-		</div>
-	{/each}
-{/if}
-
-<p>{answer}</p>
-
-{#if question != '' && answer != ''}
-	<button on:click={handleButton}>New question <span class="key-hint">(n)</span></button>
-{/if}
+	{#if answer}
+		<p>{answer}</p>
+	{/if}
+</main>
 
 <style>
 	:global(body) {
 		background-color: #000000;
 		color: #ffffff;
 		font-family: Inter;
-		/* font-family: MachineLearningFont; */
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -130,8 +69,6 @@
 	}
 
 	input {
-		/* color: inherit; */
-		/* background: transparent; */
 		color: transparent;
 		background-image: url('$lib/metallic.jpg');
 		background-repeat: no-repeat;
