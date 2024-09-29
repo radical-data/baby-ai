@@ -16,6 +16,7 @@ langchain-community = ">=0.3,<0.4"
 langchain-core = ">=0.3,<0.4"
 unstructured = {extras = ["pdf"], version = "^0.15.13"}
 langchain-ollama = "^0.2.0"
+aiosqlite = "^0.20.0"
 
 
 [build-system]

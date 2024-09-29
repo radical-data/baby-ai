@@ -5,7 +5,6 @@ services:
       - "8000:8000"
     volumes:
       - ./api:/app
-      - ./data/texts:/app/data/texts
     depends_on:
       - ollama
     networks:

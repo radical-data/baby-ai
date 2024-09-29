@@ -115,7 +115,7 @@ By default, the project uses the model defined in the .env file. You can refer t
 
 ## Troubleshooting
 
-Sometimes outdated Docker images or cached layers cause issues. Rebuild your Docker image to ensure everything is up to date.
+Sometimes outdated Docker images or cached layers cause issues. Rebuild your Docker image to ensure everything is up to date. The Docker 'turn it off and on again' equivalent is:
 
 ```bash
 docker compose down --volumes
