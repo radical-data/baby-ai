@@ -4,6 +4,9 @@ FROM python:3.12-slim
 # Set the working directory to /app
 WORKDIR /app
 
+# Install required packages for libmagic
+RUN apt-get update && apt-get install -y libmagic1
+
 # Install Poetry
 RUN pip install poetry
 
