@@ -14,7 +14,6 @@ chain = setup_langchain(model_name)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Set up database
     await create_tables()
     yield
 
@@ -41,6 +40,7 @@ add_routes(app, chain, path="/agent")
 class MessageRequest(BaseModel):
     message_text: str
 
+
 @app.post("/log_message/")
 async def log_message(message: MessageRequest):
     await add_message(message.message_text)
@@ -55,4 +55,5 @@ async def all_messages():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

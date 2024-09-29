@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { RemoteRunnable } from '@langchain/core/runnables/remote';
 
-	let question = '';
+	let message = '';
 	let answer = '';
 	let isLoading = false;
 
@@ -15,37 +15,68 @@
 		}
 	});
 
-	async function speakToAPI() {
-		if (!question.trim()) return;
+	async function logMessage(message: string) {
+		try {
+			const response = await fetch('http://localhost:8000/log_message/', {
+				method: 'POST',
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					message_text: message
+				})
+			});
 
-		isLoading = true;
-		answer = '';
+			if (!response.ok) {
+				throw new Error(`Error: ${response.statusText}`);
+			}
 
+			const data = await response.json();
+			console.log('Message logged successfully:', data);
+		} catch (error) {
+			console.error('Error logging message:', error);
+		}
+	}
+
+	async function fetchLLMResponse(message: string) {
 		try {
 			const stream = await remoteRunnable.stream({
-				text: question
+				text: message
 			});
 
 			for await (const chunk of stream) {
 				answer += chunk;
 			}
 		} catch (error) {
-			console.error('Error:', error);
+			console.error('Error with LLM stream:', error);
 			answer = 'Error: Something went wrong';
-		} finally {
-			isLoading = false;
 		}
+	}
+
+	async function handleMessage() {
+		if (!message.trim()) return;
+
+		isLoading = true;
+		answer = '';
+
+		const logPromise = logMessage(message);
+		const fetchLLMResponsePromise = fetchLLMResponse(message);
+
+		await Promise.allSettled([logPromise, fetchLLMResponsePromise]);
+
+		isLoading = false;
 	}
 </script>
 
 <main>
 	<input
-		placeholder="Your question"
-		bind:value={question}
-		on:keydown={(event) => event.key === 'Enter' && speakToAPI()}
+		placeholder="Your message"
+		bind:value={message}
+		on:keydown={(event) => event.key === 'Enter' && handleMessage()}
 	/>
 
-	<button on:click={speakToAPI} disabled={isLoading || !question.trim()}>
+	<button on:click={handleMessage} disabled={isLoading || !message.trim()}>
 		{isLoading ? 'Thinking...' : 'Say something'}
 	</button>
 
