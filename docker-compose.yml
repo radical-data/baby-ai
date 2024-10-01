@@ -6,13 +6,15 @@ services:
     volumes:
       - ./api:/app
     depends_on:
-      - ollama
+      ollama:
+        condition: service_healthy
     networks:
       - app-network
     environment:
       - OLLAMA_HOST=ollama
       - OLLAMA_PORT=11434
       - OLLAMA_MODEL=${OLLAMA_MODEL}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     command: poetry run python src/main.py
 
   web:

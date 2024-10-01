@@ -10,3 +10,12 @@ def get_model_name():
         )
         model_name = "qwen2.5:0.5b"
     return model_name
+
+
+def get_openai_api_key():
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+    if not openai_api_key:
+        raise ValueError(
+            "The OPENAI_API_KEY environment variable is not defined. Please set it."
+        )
+    return openai_api_key

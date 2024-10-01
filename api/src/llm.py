@@ -3,32 +3,38 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 from langchain_core.vectorstores import InMemoryVectorStore
-from langchain_ollama import OllamaEmbeddings
+
+# from langchain_ollama import OllamaEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.runnables import RunnablePassthrough
+from config import get_openai_api_key
 
 
 def setup_langchain(model_name: str):
-    # Load and split documents
+    print("load docs")
     loader = DirectoryLoader("./data/texts", show_progress=True)
     docs = loader.load()
 
+    print("splitting")
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     split_docs = text_splitter.split_documents(docs)
 
-    # Create embeddings and store in SQLite-VSS
+    print("create embeddings")
+    openai_api_key = get_openai_api_key()
+    embedding_function = OpenAIEmbeddings(api_key=openai_api_key)
+
     vector_store = InMemoryVectorStore.from_texts(
-        texts=[doc.page_content for doc in split_docs],
-        embedding=OllamaEmbeddings(model="nomic-embed-text:v1.5"),
+        texts=[doc.page_content for doc in split_docs], embedding=embedding_function
     )
 
-    # Create a retriever to search relevant chunks
+    print("create retriever")
     retriever = vector_store.as_retriever(
         search_type="similarity", search_kwargs={"k": 6}
     )
 
-    # Define prompt template with retrieved context and user question
+    print("define prompt")
     system_prompt = (
         "You are Baby AI. You are talking to users to learn about the world."
         "Use the following pieces of retrieved context to generate your response."
