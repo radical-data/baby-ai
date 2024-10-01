@@ -9,6 +9,6 @@ sleep 5
 ollama pull $OLLAMA_MODEL
 
 # Pull embedding model
-ollama pull "nomic-embed-text:v1.5"
+# ollama pull "nomic-embed-text:v1.5"
 
 wait
