@@ -8,15 +8,14 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
 langchain = ">=0.3,<0.4"
-faiss-cpu = "^1.8.0"
 langserve = {extras = ["all"], version = ">=0.3,<0.4"}
-tqdm = "^4.66.2"
-langchain-cli = "^0.0.31"
 langchain-community = ">=0.3,<0.4"
 langchain-core = ">=0.3,<0.4"
 unstructured = {extras = ["pdf"], version = "^0.15.13"}
 langchain-ollama = "^0.2.0"
 aiosqlite = "^0.20.0"
+langchain-text-splitters = "^0.3.0"
+langchain-openai = "^0.2.1"
 
 
 [build-system]

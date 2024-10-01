@@ -41,9 +41,7 @@
 
 	async function fetchLLMResponse(message: string) {
 		try {
-			const stream = await remoteRunnable.stream({
-				text: message
-			});
+			const stream = await remoteRunnable.stream(message);
 
 			for await (const chunk of stream) {
 				answer += chunk;

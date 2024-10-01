@@ -53,6 +53,10 @@ async def all_messages():
     return {"messages": all_messages}
 
 
+@app.get("/health")
+async def get_health():
+    return {"status": "healthy"}
+
 if __name__ == "__main__":
     import uvicorn
 
